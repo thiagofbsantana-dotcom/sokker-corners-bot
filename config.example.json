@@ -1,0 +1,9 @@
+{
+  "enabled": false,
+  "dry_run": true,
+  "ht": {"enabled": true, "min_corners": 4, "minute_from": 25, "minute_to": 44},
+  "ft": {"enabled": true, "min_corners": 8, "minute_from": 65, "minute_to": 89},
+  "max_matches": 6,
+  "league_ids": [],
+  "allow_empty_live": false
+}
