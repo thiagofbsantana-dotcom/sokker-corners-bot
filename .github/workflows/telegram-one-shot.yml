@@ -1,0 +1,33 @@
+name: Teste único Telegram (sem dados de jogos)
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  send:
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - name: Enviar mensagem de teste ao grupo
+        env:
+          TG_SOKKERPRO_TOKEN: ${{ secrets.TG_SOKKERPRO_TOKEN }}
+          TG_GROUP_ID: ${{ secrets.TG_GROUP_ID }}
+        run: |
+          python - <<'PY'
+          import json, os, urllib.request
+          token = os.environ.get('TG_SOKKERPRO_TOKEN')
+          group = os.environ.get('TG_GROUP_ID')
+          if not token or not group:
+              raise SystemExit('Secrets do Telegram ausentes')
+          url = 'https://api.telegram.org/bot' + token + '/sendMessage'
+          data = json.dumps({'chat_id': group, 'text': '✅ Teste único do bot de escanteios. Nenhum alerta automático foi ativado.'}).encode()
+          request = urllib.request.Request(url, data=data, headers={'Content-Type': 'application/json'})
+          try:
+              with urllib.request.urlopen(request, timeout=20) as response:
+                  result = json.load(response)
+          except Exception:
+              raise SystemExit('Falha no envio; confira os Secrets e se o bot pode postar no grupo (sem exibir credenciais)')
+          if result.get('ok') is not True:
+              raise SystemExit('Telegram não confirmou o envio')
+          print('Telegram confirmou a mensagem de teste ao grupo')
+          PY
