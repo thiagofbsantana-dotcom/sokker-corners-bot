@@ -1,0 +1,34 @@
+name: Teste manual API-Football escanteios
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 4
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: pip install -r requirements.txt
+      - name: Consultar API sem enviar ao Telegram
+        env:
+          API_FOOTBALL_KEY: ${{ secrets.API_FOOTBALL_KEY }}
+        run: |
+          cp config.example.json config.json
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          p = Path('config.json')
+          cfg = json.loads(p.read_text())
+          cfg['enabled'] = True
+          cfg['dry_run'] = True
+          cfg['max_matches'] = 6
+          p.write_text(json.dumps(cfg))
+          PY
+          python api_football_bot.py
